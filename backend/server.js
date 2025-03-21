@@ -1,6 +1,7 @@
 const express=require('express')
 const dotenv=require('dotenv')
 const productRoutes=require('./routes/productRoutes');
+const cors=require("cors");
 
 dotenv.config();
 
@@ -8,6 +9,8 @@ const app = express();
 
 // Middleware to parse JSON request body
 app.use(express.json());
+
+app.use(cors());
 
 // Use the routes for products
 app.use('/api/products', productRoutes);
