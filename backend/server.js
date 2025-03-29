@@ -1,27 +1,41 @@
-const express=require('express')
-const dotenv=require('dotenv')
-const productRoutes=require('./routes/productRoutes');
-const cors=require("cors");
+const express = require("express");
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const productRoutes = require("./routes/productRoutes");
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+const authMiddleware = require("./middleware/authMiddleware");
+
 
 dotenv.config();
+console.log("MongoDB URI:", process.env.MONGO_URI);
+
 
 const app = express();
 
 // Middleware to parse JSON request body
 app.use(express.json());
 
+// Enable CORS
 app.use(cors());
 
-// Use the routes for products
-app.use('/api/products', productRoutes);
+// Public routes (no authentication required)
+app.use("/auth", authRoutes);
 
-// Set up a basic route to check server status
-app.get('/', (req, res) => {
-  res.send('E-commerce Backend is Running!');
-});
+// Protected routes (authentication required)
+app.use("/api/products", authMiddleware, productRoutes);
+app.use("/api/user", authMiddleware, userRoutes);
 
-// Set up the port from environment variables
+// Database connection
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("MongoDB Connection Failed", err));
+
+// Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

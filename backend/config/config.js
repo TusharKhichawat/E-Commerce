@@ -1,5 +1,13 @@
 // config/db.js
 const mongoose = require('mongoose');
+require('dotenv').config(); // Load environment variables
+
+// Store config values
+const config = {
+  MONGO_URI: process.env.MONGO_URI,
+  JWT_SECRET: process.env.JWT_SECRET,
+};
+
 
 const connectDB = async () => {
   try {
@@ -14,7 +22,7 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB;
+module.exports = { ...config, connectDB };
 
 
 //Make sure to add the MongoDB URI to your .env file
